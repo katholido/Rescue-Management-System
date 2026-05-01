@@ -14,4 +14,9 @@ class Incident extends Model
         'status',
         'reported_at',
     ];
+
+    public function teamMembers()
+    {
+        return $this->belongsToMany(TeamMember::class);
+    }
 }

@@ -70,8 +70,50 @@
                             </div>
 
                             <div class="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Assigned Personnel</h3>
-                                <p class="text-gray-500 dark:text-gray-400 italic">No personnel assigned yet. (Feature coming in Phase 3)</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 uppercase tracking-widest text-sm font-bold text-gray-500">Assigned Personnel</h3>
+                                
+                                @if($incident->teamMembers->count() > 0)
+                                    <div class="space-y-2 mb-6">
+                                        @foreach($incident->teamMembers as $member)
+                                            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                <div class="flex items-center">
+                                                    <div class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold mr-3">
+                                                        {{ substr($member->name, 0, 1) }}
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium">{{ $member->name }}</p>
+                                                        <p class="text-xs text-gray-500">{{ $member->role }}</p>
+                                                    </div>
+                                                </div>
+                                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                    Active
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p class="text-gray-500 dark:text-gray-400 italic mb-6">No personnel assigned to this incident yet.</p>
+                                @endif
+
+                                <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-dashed border-gray-300 dark:border-gray-600">
+                                    <h4 class="text-sm font-bold mb-3">Manage Deployment</h4>
+                                    <form action="{{ route('incidents.assign-members', $incident) }}" method="POST">
+                                        @csrf
+                                        <div class="mb-4">
+                                            <select name="members[]" multiple class="block w-full mt-1 border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm h-32">
+                                                @foreach($allMembers as $member)
+                                                    <option value="{{ $member->id }}" @selected($incident->teamMembers->contains($member->id))>
+                                                        {{ $member->name }} ({{ $member->role }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <p class="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple members.</p>
+                                        </div>
+                                        <x-primary-button class="w-full justify-center">
+                                            {{ __('Update Assignments') }}
+                                        </x-primary-button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>

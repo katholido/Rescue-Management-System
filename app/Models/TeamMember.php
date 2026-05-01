@@ -12,4 +12,9 @@ class TeamMember extends Model
         'phone',
         'availability_status',
     ];
+
+    public function incidents()
+    {
+        return $this->belongsToMany(Incident::class);
+    }
 }
