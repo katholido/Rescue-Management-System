@@ -26,6 +26,9 @@
                     <x-nav-link :href="route('team-members.index')" :active="request()->routeIs('team-members.*')" class="text-sm font-semibold">
                         {{ __('Team Members') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" class="text-sm font-semibold">
+                        {{ __('Reports') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -85,6 +88,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('team-members.index')" :active="request()->routeIs('team-members.*')" class="rounded-xl">
                 {{ __('Team Members') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" class="rounded-xl">
+                {{ __('Reports') }}
             </x-responsive-nav-link>
         </div>
 
