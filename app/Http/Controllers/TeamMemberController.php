@@ -13,8 +13,8 @@ class TeamMemberController extends Controller
      */
     public function index()
     {
-        $members = TeamMember::latest()->paginate(10);
-        return view('team_members.index', compact('members'));
+        $teamMembers = TeamMember::latest()->paginate(10);
+        return view('team_members.index', compact('teamMembers'));
     }
 
     public function create()
