@@ -23,4 +23,9 @@ class Incident extends Model
     {
         return $this->belongsToMany(TeamMember::class);
     }
+
+    public function updates()
+    {
+        return $this->hasMany(IncidentUpdate::class)->latest();
+    }
 }

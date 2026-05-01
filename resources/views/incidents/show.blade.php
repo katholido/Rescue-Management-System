@@ -23,10 +23,16 @@
                             <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
                                 <h1 class="text-3xl font-black text-slate-900 dark:text-white">{{ $incident->title }}</h1>
                                 <div class="flex gap-2">
-                                    <span class="px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full bg-red-100 text-red-700">
+                                    <span class="px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full 
+                                        @if($incident->priority == 'Critical') bg-red-600 text-white 
+                                        @elseif($incident->priority == 'High') bg-orange-100 text-orange-700 
+                                        @else bg-slate-100 text-slate-700 @endif">
                                         {{ $incident->priority }}
                                     </span>
-                                    <span class="px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full bg-blue-100 text-blue-700">
+                                    <span class="px-4 py-1.5 text-xs font-black uppercase tracking-widest rounded-full 
+                                        @if($incident->status == 'Open') bg-red-100 text-red-700 
+                                        @elseif($incident->status == 'Ongoing') bg-blue-100 text-blue-700 
+                                        @else bg-green-100 text-green-700 @endif">
                                         {{ $incident->status }}
                                     </span>
                                 </div>
@@ -58,54 +64,53 @@
                         </div>
                     </div>
 
-                    <!-- Assignments (Phase 3 functionality) -->
+                    <!-- Operational Notes & Comments -->
                     <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
                         <div class="p-8 sm:p-12">
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-8">Deployed Personnel</h3>
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
+                                Operational Intelligence
+                            </h3>
                             
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
-                                @forelse($incident->teamMembers as $member)
-                                    <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center font-bold text-white shadow-sm">
-                                                {{ substr($member->name, 0, 1) }}
+                            <form action="{{ route('incidents.updates.store', $incident) }}" method="POST" class="mb-10">
+                                @csrf
+                                <div class="relative">
+                                    <textarea name="message" rows="3" class="block w-full bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-red-500 focus:ring-red-500 rounded-2xl shadow-sm p-6" placeholder="Add an operational note or status update..."></textarea>
+                                    <div class="absolute bottom-4 right-4">
+                                        <button type="submit" class="p-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-500/20">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <div class="space-y-6">
+                                @forelse($updates as $update)
+                                    <div class="flex gap-4 group">
+                                        <div class="flex flex-col items-center">
+                                            <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-slate-400 text-xs">
+                                                {{ substr($update->user->name, 0, 1) }}
                                             </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $member->name }}</p>
-                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{ $member->role }}</p>
-                                            </div>
+                                            <div class="flex-1 w-px bg-slate-100 dark:bg-slate-800 my-2"></div>
                                         </div>
-                                        <span class="px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full bg-green-100 text-green-700">Active</span>
+                                        <div class="flex-1 pb-6">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="font-bold text-sm text-slate-900 dark:text-white">{{ $update->user->name }}</span>
+                                                <span class="text-[10px] font-bold text-slate-400 uppercase">{{ $update->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                                                @if($update->type == 'status_change')
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase bg-indigo-100 text-indigo-700 mr-2">Status Update</span>
+                                                @elseif($update->type == 'personnel_assigned')
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase bg-blue-100 text-blue-700 mr-2">Personnel Orders</span>
+                                                @endif
+                                                {{ $update->message }}
+                                            </p>
+                                        </div>
                                     </div>
                                 @empty
-                                    <div class="col-span-full py-8 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-                                        <p class="text-slate-400 italic">No personnel currently assigned to this mission.</p>
-                                    </div>
+                                    <div class="text-center py-8 text-slate-400 italic">No operational notes filed yet.</div>
                                 @endforelse
-                            </div>
-
-                            <!-- Deployment Manager -->
-                            <div class="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-[2rem] border border-slate-100 dark:border-slate-700">
-                                <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                                    Manage Deployment
-                                </h4>
-                                <form action="{{ route('incidents.assign-members', $incident) }}" method="POST">
-                                    @csrf
-                                    <div class="mb-6">
-                                        <select name="members[]" multiple class="block w-full mt-1 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-red-500 focus:ring-red-500 rounded-2xl shadow-sm h-40 p-4">
-                                            @foreach($allMembers as $member)
-                                                <option value="{{ $member->id }}" @selected($incident->teamMembers->contains($member->id)) class="py-2">
-                                                    {{ $member->name }} — {{ $member->role }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <p class="text-xs text-slate-400 mt-3 ml-2">Hold Ctrl (Cmd) to select multiple force members for this mission.</p>
-                                    </div>
-                                    <x-primary-button class="w-full justify-center py-4 text-sm">
-                                        {{ __('Update Deployment Orders') }}
-                                    </x-primary-button>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -113,42 +118,77 @@
 
                 <!-- Actions Sidebar -->
                 <div class="space-y-8">
+                    <!-- Deployed Personnel Section -->
+                    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
+                        <div class="p-8">
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                                Active Team
+                            </h3>
+                            <div class="space-y-3 mb-6">
+                                @forelse($incident->teamMembers as $member)
+                                    <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                        <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center font-bold text-white text-xs">
+                                            {{ substr($member->name, 0, 1) }}
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-bold text-slate-900 dark:text-white truncate">{{ $member->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">{{ $member->role }}</p>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <p class="text-xs text-slate-400 italic">No personnel deployed.</p>
+                                @endforelse
+                            </div>
+                            
+                            <button x-data="" @click="$dispatch('open-modal', 'manage-deployment')" class="w-full py-3 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold text-xs hover:bg-slate-800 transition-all">
+                                Deploy Force
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Operational Actions -->
                     <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl">
-                        <h3 class="text-lg font-bold mb-6">Operational Actions</h3>
+                        <h3 class="text-lg font-bold mb-6">System Operations</h3>
                         <div class="space-y-4">
                             <a href="{{ route('incidents.edit', $incident) }}" class="flex items-center justify-center gap-2 w-full py-4 bg-white/10 hover:bg-white/20 rounded-2xl font-bold transition-all border border-white/10">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 Edit Incident
                             </a>
-                            <form action="{{ route('incidents.destroy', $incident) }}" method="POST" onsubmit="return confirm('Archive this incident record?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="flex items-center justify-center gap-2 w-full py-4 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded-2xl font-bold transition-all border border-red-600/20">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                    Archive Incident
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 border border-slate-100 dark:border-slate-800">
-                        <h3 class="text-lg font-bold mb-4 text-slate-900 dark:text-white">Status Timeline</h3>
-                        <div class="relative space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                            <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                                <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-300 group-[.is-active]:bg-red-600 text-slate-500 group-[.is-active]:text-red-50 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
-                                    <svg class="fill-current" xmlns="http://www.w3.org/2000/svg" width="12" height="10">
-                                        <path fill-rule="nonzero" d="M10.422 1.257 4.655 7.025 1.578 3.948 0 5.527l4.655 4.655 7.345-7.345z" />
-                                    </svg>
-                                </div>
-                                <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow">
-                                    <time class="font-bold text-red-500 text-xs">Reported</time>
-                                    <div class="text-slate-500 text-xs">Initial report filed.</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Deployment Modal -->
+    <x-modal name="manage-deployment" :show="$errors->isNotEmpty()" focusable>
+        <div class="p-8">
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Deploy Response Force</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Select personnel to assign to this incident mission.</p>
+            
+            <form action="{{ route('incidents.assign-members', $incident) }}" method="POST">
+                @csrf
+                <div class="mb-8">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+                        @foreach($allMembers as $member)
+                            <label class="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-2 border-transparent has-[:checked]:border-red-500 has-[:checked]:bg-red-50/50 dark:has-[:checked]:bg-red-900/10 cursor-pointer transition-all">
+                                <input type="checkbox" name="members[]" value="{{ $member->id }}" @checked($incident->teamMembers->contains($member->id)) class="w-5 h-5 rounded border-slate-300 text-red-600 focus:ring-red-500">
+                                <div>
+                                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $member->name }}</p>
+                                    <p class="text-[10px] font-bold text-slate-500 uppercase">{{ $member->role }}</p>
+                                </div>
+                            </label>
+                        @endforeach
+                    </div>
+                </div>
+                
+                <div class="flex justify-end gap-4 mt-8">
+                    <x-secondary-button x-on:click="$dispatch('close')">Cancel</x-secondary-button>
+                    <x-primary-button type="submit">Issue Deployment Orders</x-primary-button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
 </x-app-layout>
