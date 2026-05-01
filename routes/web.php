@@ -21,6 +21,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('incidents', IncidentController::class);
     Route::post('incidents/{incident}/assign-members', [IncidentController::class, 'assignMembers'])->name('incidents.assign-members');
     Route::resource('team-members', TeamMemberController::class);
+
+    // Reports
+    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/incidents/csv', [\App\Http\Controllers\ReportController::class, 'exportIncidentsCsv'])->name('reports.incidents.csv');
+    Route::get('/reports/incidents/pdf', [\App\Http\Controllers\ReportController::class, 'exportIncidentsPdf'])->name('reports.incidents.pdf');
 });
 
 require __DIR__.'/auth.php';
