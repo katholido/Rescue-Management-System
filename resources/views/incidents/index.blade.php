@@ -14,6 +14,31 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    
+                    <div class="mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                        <form action="{{ route('incidents.index') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1">
+                                <x-text-input name="search" placeholder="Search by title or location..." class="w-full" :value="request('search')" />
+                            </div>
+                            <div class="w-full md:w-48">
+                                <select name="status" class="w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                    <option value="">All Statuses</option>
+                                    <option value="Open" @selected(request('status') == 'Open')>Open</option>
+                                    <option value="Ongoing" @selected(request('status') == 'Ongoing')>Ongoing</option>
+                                    <option value="Closed" @selected(request('status') == 'Closed')>Closed</option>
+                                </select>
+                            </div>
+                            <x-primary-button type="submit">
+                                {{ __('Filter') }}
+                            </x-primary-button>
+                            @if(request()->anyFilled(['search', 'status']))
+                                <a href="{{ route('incidents.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                    {{ __('Clear') }}
+                                </a>
+                            @endif
+                        </form>
+                    </div>
+
                     @if(session('success'))
                         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
                             {{ session('success') }}

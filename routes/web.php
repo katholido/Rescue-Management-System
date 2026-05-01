@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('incidents', IncidentController::class);
+    Route::post('incidents/{incident}/assign-members', [IncidentController::class, 'assignMembers'])->name('incidents.assign-members');
     Route::resource('team-members', TeamMemberController::class);
 });
 

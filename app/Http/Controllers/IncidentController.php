@@ -11,9 +11,20 @@ class IncidentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $incidents = Incident::latest()->paginate(10);
+        $query = Incident::query();
+
+        if ($request->has('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%')
+                  ->orWhere('location', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        $incidents = $query->latest()->paginate(10)->withQueryString();
         return view('incidents.index', compact('incidents'));
     }
 
@@ -40,7 +51,8 @@ class IncidentController extends Controller
 
     public function show(Incident $incident)
     {
-        return view('incidents.show', compact('incident'));
+        $allMembers = \App\Models\TeamMember::all();
+        return view('incidents.show', compact('incident', 'allMembers'));
     }
 
     public function edit(Incident $incident)
@@ -69,5 +81,11 @@ class IncidentController extends Controller
         $incident->delete();
 
         return redirect()->route('incidents.index')->with('success', 'Incident deleted successfully.');
+    }
+
+    public function assignMembers(Request $request, Incident $incident)
+    {
+        $incident->teamMembers()->sync($request->members);
+        return redirect()->route('incidents.show', $incident)->with('success', 'Team members updated for this incident.');
     }
 }
