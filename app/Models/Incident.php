@@ -15,8 +15,17 @@ class Incident extends Model
         'reported_at',
     ];
 
+    protected $casts = [
+        'reported_at' => 'datetime',
+    ];
+
     public function teamMembers()
     {
         return $this->belongsToMany(TeamMember::class);
+    }
+
+    public function updates()
+    {
+        return $this->hasMany(IncidentUpdate::class)->latest();
     }
 }

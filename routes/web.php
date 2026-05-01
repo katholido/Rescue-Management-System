@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('incidents', IncidentController::class);
     Route::post('incidents/{incident}/assign-members', [IncidentController::class, 'assignMembers'])->name('incidents.assign-members');
+    Route::post('incidents/{incident}/updates', [IncidentController::class, 'storeUpdate'])->name('incidents.updates.store');
     Route::resource('team-members', TeamMemberController::class);
 });
 
