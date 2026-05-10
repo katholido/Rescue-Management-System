@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex items-center gap-4">
             <h2 class="font-bold text-2xl text-slate-800 dark:text-slate-200 leading-tight">
-                {{ __('Account Intelligence') }}
+                {{ __('My Profile') }}
             </h2>
         </div>
     </x-slot>

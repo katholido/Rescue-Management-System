@@ -17,6 +17,7 @@ class DashboardController extends Controller
         
         $recentIncidents = Incident::latest()->take(5)->get();
         $recentMembers = TeamMember::latest()->take(5)->get();
+        $recentUpdates = \App\Models\IncidentUpdate::with(['user', 'incident'])->latest()->take(8)->get();
 
         return view('dashboard', compact(
             'totalIncidents', 
@@ -24,7 +25,8 @@ class DashboardController extends Controller
             'availableMembers', 
             'totalMembers',
             'recentIncidents',
-            'recentMembers'
+            'recentMembers',
+            'recentUpdates'
         ));
     }
 }

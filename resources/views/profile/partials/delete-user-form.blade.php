@@ -1,11 +1,11 @@
 <section class="space-y-6">
     <header>
         <h2 class="text-xl font-black text-red-600 dark:text-red-500">
-            {{ __('Terminate Operational Access') }}
+            {{ __('Delete Account') }}
         </h2>
 
         <p class="mt-1 text-sm text-slate-500">
-            {{ __('Once access is terminated, all associated operational data will be purged. This action is irreversible.') }}
+            {{ __('Once your account is deleted, everything will be permanently removed.') }}
         </p>
     </header>
 
@@ -13,7 +13,7 @@
         x-data=""
         x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
         class="inline-flex items-center px-6 py-3 bg-red-600/10 border border-red-600/20 rounded-xl font-bold text-xs text-red-600 uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all"
-    >{{ __('Terminate Account') }}</button>
+    >{{ __('Delete Account') }}</button>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
         <form method="post" action="{{ route('profile.destroy') }}" class="p-8">
@@ -21,15 +21,15 @@
             @method('delete')
 
             <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">
-                {{ __('Confirm Termination') }}
+                {{ __('Are you sure?') }}
             </h2>
 
             <p class="text-sm text-slate-500 mb-8">
-                {{ __('Please verify your identity by entering your protocol key to confirm permanent account termination.') }}
+                {{ __('Please enter your password to confirm you want to permanently delete your account.') }}
             </p>
 
             <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Protocol Key') }}" class="sr-only" />
+                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
 
                 <x-text-input
                     id="password"
@@ -44,11 +44,11 @@
 
             <div class="mt-8 flex justify-end gap-4">
                 <x-secondary-button x-on:click="$dispatch('close')">
-                    {{ __('Abort') }}
+                    {{ __('Cancel') }}
                 </x-secondary-button>
 
                 <button type="submit" class="inline-flex items-center px-8 py-3 bg-red-600 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-800 transition-all shadow-lg shadow-red-500/20">
-                    {{ __('Confirm Purge') }}
+                    {{ __('Delete Account') }}
                 </button>
             </div>
         </form>

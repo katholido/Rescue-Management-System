@@ -1,11 +1,11 @@
 <section>
     <header class="mb-8">
         <h2 class="text-xl font-black text-slate-900 dark:text-white">
-            {{ __('Personnel Credentials') }}
+            {{ __('Account Details') }}
         </h2>
 
         <p class="mt-1 text-sm text-slate-500">
-            {{ __("Maintain your operational identity and communication channels.") }}
+            {{ __("Update your name and email address.") }}
         </p>
     </header>
 
